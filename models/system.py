@@ -11,7 +11,8 @@ class System(object):
 
         self.x = 0
         self.y = 0
-        self._state = np.array([self.x, self.y, phi, psi])
+        self.p = 0
+        self._state = np.array([self.x, self.y, phi, psi, self.p])
         self._TAS = tas
 
         self.kin_equats = kin_equats
@@ -29,14 +30,11 @@ class System(object):
     def state(self):
         return self._state
 
-    def propagate(self, env, dt=0.01):
-
-        tas   = self._TAS
-        wind  = env.wind
+    def propagate(self, aircraft, env, dt=0.01):
 
         time = self._ode_kin_equats.t + dt
 
-        self._ode_kin_equats.set_f_params(tas, wind)
+        self._ode_kin_equats.set_f_params(self._TAS, env.wind, aircraft.controls)
         state = self._ode_kin_equats.integrate(time)
 
         if self._ode_kin_equats.successful():
