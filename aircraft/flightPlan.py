@@ -20,7 +20,7 @@ class FlightPlan:
         return np.array([self.prev_wp, self.next_wp])
 
     def have_passed_next_wp(self, pos):
-        if bn.dist_2d(pos[1], self.next_wp[1]) <= self.wp_accept_dist:
+        if bn.dist_2d(pos, self.next_wp) <= self.wp_accept_dist:
             res = True
         else:
             res = False

@@ -1,6 +1,8 @@
 from regulator import rollReg, navReg
 from flightPlan import basic_fpl
 
+import numpy as np
+
 
 class Aircraft(object):
 
@@ -8,10 +10,15 @@ class Aircraft(object):
         self._TAS = 15  # m/s
         self._fpl = flightPlan
         self._regulators = dict(roll=rollReg, nav=navReg)
+        self._last_controls = np.array([0])  # zero control input is still a valid input
 
     @property
     def airspeed(self):
         return self._TAS
+
+    @property
+    def controls(self):
+        return self._last_controls
 
     def update(self, system):
 
@@ -20,6 +27,8 @@ class Aircraft(object):
 
         roll_dem      = self._regulators['nav'].update(system, cur_leg)
         roll_rate_dem = self._regulators['roll'].update(system, roll_dem)
+
+        self._last_controls = np.array([roll_rate_dem])
 
         # TODO logging of aircraft control variables
 
