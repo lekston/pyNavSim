@@ -5,13 +5,14 @@ from models.flat_earth import kin_equats, kin_equats_jac
 
 class System(object):
 
-    def __init__(self, phi=0, psi=0, TAS=15,
+    # noinspection PyPep8Naming
+    def __init__(self, phi=0, psi=0, tas=15,
                  integrator='dopri5', use_jac=False, **integrator_params):
 
         self.x = 0
         self.y = 0
-        self._state = np.array([x, y, phi, psi])
-        self.TAS = TAS
+        self._state = np.array([self.x, self.y, phi, psi])
+        self._TAS = tas
 
         self.kin_equats = kin_equats
 
@@ -30,12 +31,12 @@ class System(object):
 
     def propagate(self, env, dt=0.01):
 
-        TAS   = self.TAS
+        tas   = self._TAS
         wind  = env.wind
 
         time = self._ode_kin_equats.t + dt
 
-        self._ode_kin_equats.set_f_params(TAS, wind)
+        self._ode_kin_equats.set_f_params(tas, wind)
         state = self._ode_kin_equats.integrate(time)
 
         if self._ode_kin_equats.successful():
