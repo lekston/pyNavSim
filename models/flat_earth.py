@@ -10,7 +10,7 @@ g = 9.81
 """
 
 
-def kin_equats(time, state, tas, wind, control):
+def kin_equats(time, state, tas, wind, controls):
     # TODO must provide 'p' - either as a state or control variable
     #   It is simpler to have it as control variable and keeps
     #   its state separately
@@ -18,6 +18,8 @@ def kin_equats(time, state, tas, wind, control):
     phi = state[2]
     psi = state[3]
     p   = state[4]
+
+    rollRateDem = controls[0]
 
     wind_dir, wind_spd = wind
 
@@ -29,7 +31,7 @@ def kin_equats(time, state, tas, wind, control):
 
     dpsi_dt = g * tan(phi) / tas
 
-    dp_dt = control['rrate']
+    dp_dt = rollRateDem
 
     return np.array([dx_dt, dy_dt, dphi_dt, dpsi_dt, dp_dt])
 
