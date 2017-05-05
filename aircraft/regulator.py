@@ -11,37 +11,40 @@ class Regulator(object):
 
 class RollRegulator(Regulator):
 
-    def __init__(self):
-        self.phi_max    = np.deg2rad(40)    # 40 deg
-        self.p_max      = np.deg2rad(40)    # 40 deg/sec
-        self.p_dot_max  = np.deg2rad(30)    # 30 deg/sec^2
+    def __init__(self, phi_max=40, p_max=40, p_dot_max=30):
+        self._phi_max    = np.deg2rad(phi_max)      # 40 deg by default
+        self._p_max      = np.deg2rad(p_max)        # 40 deg/sec by default
+        self._p_dot_max  = np.deg2rad(p_dot_max)    # 30 deg/sec^2 by default
 
     @property
-    def p1(self):
-        return self.phi_max
+    def phi_max(self):
+        return self._phi_max
 
     @property
-    def p2(self):
-        return self.p_max
+    def p_max(self):
+        return self._p_max
 
     @property
-    def p3(self):
-        return self.p_dot_max
+    def p_dot_max(self):
+        return self._p_dot_max
 
-    def update(self, system, demand):
+    def update(self, system, roll_dem):
 
-        return system
+        roll = system.state_dict['phi']
+        roll_rate_cmd = roll_dem - roll  # direct gain (k_p = 1)
+        return roll_rate_cmd
 
 
 class L1NavRegulator(Regulator):
 
     def __init__(self):
         self.L1_period = 20     # sec
-        self.L1_damping = 0.75  #'dimless'
+        self.L1_damping = 0.75  # 'dimless'
 
-    def update(self, system, demand):
+    def update(self, system, cur_leg):
 
-        return system
+        roll_dem = 0
+        return roll_dem
 
 
 rollReg = RollRegulator()
