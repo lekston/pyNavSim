@@ -45,6 +45,17 @@ def get_wind_corr(psi, tas, wind_dir, wind_spd):
     return np.array([wca, gnd_spd, xwind, twind])
 
 
+def dist_2d(x1, x2):
+    assert(type(t) is tuple or type(t) is np.ndarray)
+    diff = (x1[0] - x2[0], x1[1] - x2[1])
+    return norm_2d(diff)
+
+
+def norm_2d(x):
+    assert(type(t) is tuple or type(t) is np.ndarray)
+    return np.sqrt(x[0]**2 + x[1]**2)
+
+
 def wrap_180(angle):
     result = wrap_360(angle)
     if result > 180.0:
