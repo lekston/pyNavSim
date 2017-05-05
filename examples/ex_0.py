@@ -8,14 +8,22 @@ try:
 except:
     print "Check run path, must be run from: ./40.SmoothTraj"
 
-sys = System()
-env = Env(150, 10)
+import matplotlib.pyplot as plt
 
-t_sim_end = 20      # sec
+phi_init = 0.5
+
+sys = System(phi=phi_init, psi=0, use_jac=True)
+env = Env(150, 1)
+
+t_sim_end = 40      # sec
 sampling_rate = 100 # Hz
 N = t_sim_end * sampling_rate + 1
 time = np.linspace(0, t_sim_end, num=N)
 
-sim = Sim(basic_aircraft, sys, env, time)
-sim.run_simulation(verbose=False)
+sim = Sim(basic_aircraft, sys, env, time, verbose=False)
+sim.override_roll(phi_init)
+sim.run_simulation()
 
+plt.plot(sim.logs['x'][:-2], sim.logs['y'][:-2])
+
+plt.show()
