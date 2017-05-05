@@ -10,6 +10,10 @@ class Sim(object):
         self._system    = system
         self._env       = env
         self._time      = time
+        self._log_dict  = {}
+        self._par_list  = []
+
+        self.setup_logging()
 
     def time_step(self, dt):
 
@@ -30,8 +34,13 @@ class Sim(object):
 
         self.save_current_par_dict()
 
-    def set_par_dict(self, par_list):
-        pass
+    def setup_logging(self):
+        self._par_list = ['x', 'y', 'phi', 'psi', 'p']
+        for key in self._aircraft.regulators:
+            self._par_list.extend(self._aircraft.regulators[key].par_list)
+
+        for name in self._par_list:
+            sys.stdout.write(name + str(' '))
 
     def save_current_par_dict(self):
         pass
