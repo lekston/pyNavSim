@@ -33,14 +33,14 @@ import numpy as np
 ''' wind_dir - where to the wind is blowing '''
 
 
-def get_wind_corr(psi, TAS, wind_dir, wind_spd):
+def get_wind_corr(psi, tas, wind_dir, wind_spd):
     wta = wrap_180(wind_dir - psi)  # wind dir relative to track angle
 
     xwind = wind_spd * sin(wta)
     twind = wind_spd * cos(wta)
 
-    wca = arcsin(-xwind / TAS)
-    gnd_spd = TAS * cos(wca) + twind
+    wca = arcsin(-xwind / tas)
+    gnd_spd = tas * cos(wca) + twind
 
     return np.array([wca, gnd_spd, xwind, twind])
 
