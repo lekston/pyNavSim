@@ -46,13 +46,14 @@ def get_wind_corr(psi, tas, wind_dir, wind_spd):
 
 
 def dist_2d(x1, x2):
-    assert(type(t) is tuple or type(t) is np.ndarray)
+    assert(type(x1) is tuple or type(x1) is np.ndarray)
+    assert(type(x2) is tuple or type(x2) is np.ndarray)
     diff = (x1[0] - x2[0], x1[1] - x2[1])
     return norm_2d(diff)
 
 
 def norm_2d(x):
-    assert(type(t) is tuple or type(t) is np.ndarray)
+    assert(type(x) is tuple or type(x) is np.ndarray)
     return np.sqrt(x[0]**2 + x[1]**2)
 
 

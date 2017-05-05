@@ -40,7 +40,7 @@ class System(object):
 
         time = self._ode_kin_equats.t + dt
 
-        self._ode_kin_equats.set_f_params(aircraft.airspeed(), env.wind(), aircraft.controls)
+        self._ode_kin_equats.set_f_params(aircraft.airspeed, env.wind, aircraft.controls)
         state = self._ode_kin_equats.integrate(time)
 
         if self._ode_kin_equats.successful():
