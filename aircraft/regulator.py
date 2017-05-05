@@ -5,8 +5,16 @@ import numpy as np
 class Regulator(object):
 
     @abstractmethod
+    def __init__(self):
+        self._log_par_list = []
+
+    @abstractmethod
     def update(self, system, demand):
         return system
+
+    @property
+    def par_list(self):
+        return self._par_list
 
 
 class RollRegulator(Regulator):
@@ -15,6 +23,7 @@ class RollRegulator(Regulator):
         self._phi_max    = np.deg2rad(phi_max)      # 40 deg by default
         self._p_max      = np.deg2rad(p_max)        # 40 deg/sec by default
         self._p_dot_max  = np.deg2rad(p_dot_max)    # 30 deg/sec^2 by default
+        self._par_list = ['p_dot_dem']
 
     @property
     def phi_max(self):
@@ -40,6 +49,7 @@ class L1NavRegulator(Regulator):
     def __init__(self):
         self.L1_period = 20     # sec
         self.L1_damping = 0.75  # 'dimless'
+        self._par_list = ['L1_out1', 'L1_out2']
 
     def update(self, system, cur_leg):
 

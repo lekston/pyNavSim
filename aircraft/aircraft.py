@@ -11,10 +11,15 @@ class Aircraft(object):
         self._fpl = flightPlan
         self._regulators = dict(roll=rollReg, nav=navReg)
         self._last_controls = np.array([0])  # zero control input is still a valid input
+        self._par_list = []
 
     @property
     def airspeed(self):
         return self._TAS
+
+    @property
+    def regulators(self):
+        return self._regulators
 
     @property
     def controls(self):
