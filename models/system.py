@@ -6,11 +6,11 @@ from models.flat_earth import kin_equats, kin_equats_jac
 class System(object):
 
     # noinspection PyPep8Naming
-    def __init__(self, phi=0, psi=0, tas=15,
+    def __init__(self, x=0, y=0, phi=0, psi=0, tas=15,
                  integrator='dopri5', use_jac=False, **integrator_params):
 
-        self.x = 0
-        self.y = 0
+        self.x = x
+        self.y = y
         self.p = 0
         self._state = np.array([self.x, self.y, phi, psi, self.p])
         self._TAS = tas
@@ -30,11 +30,17 @@ class System(object):
     def state(self):
         return self._state
 
+    @property
+    def state_dict(self):
+        res = dict(x=self._state[0], y=self._state[1],
+                   phi=self._state[2], psi=self._state[3], p=self._state[4])
+        return res
+
     def propagate(self, aircraft, env, dt=0.01):
 
         time = self._ode_kin_equats.t + dt
 
-        self._ode_kin_equats.set_f_params(self._TAS, env.wind, aircraft.controls)
+        self._ode_kin_equats.set_f_params(aircraft.airspeed(), env.wind(), aircraft.controls)
         state = self._ode_kin_equats.integrate(time)
 
         if self._ode_kin_equats.successful():
