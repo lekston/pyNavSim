@@ -7,6 +7,7 @@ class Env:
     def __init__(self, wind_dir_to=0, wind_spd=0):
 
         self._wind_to = np.array([wind_dir_to, wind_spd])
+        self._observables = {'wind': self._wind_to}
 
     @property
     def wind(self):
@@ -21,3 +22,7 @@ class Env:
         dir_to = self.wind[0]
         spd = self.wind[1]
         return np.array([bn.wrap_2pi(dir_to - np.pi), spd])
+
+    @property
+    def observables(self):
+        return self._observables

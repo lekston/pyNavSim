@@ -1,4 +1,5 @@
 import numpy as np
+import utils.basic_nav as bn
 from scipy.integrate import ode
 from models.flat_earth import kin_equats, kin_equats_jac
 
@@ -11,9 +12,10 @@ class System(object):
 
         self.x = x
         self.y = y
-        self.p = 0
+        self.p = 0.
         self._state = np.array([self.x, self.y, phi, psi, self.p])
         self._TAS = tas
+        self._observables = {'gnd_spd': 0.}
 
         self.kin_equats = kin_equats
 
@@ -36,6 +38,10 @@ class System(object):
                    phi=self._state[2], psi=self._state[3], p=self._state[4])
         return res
 
+    @property
+    def observables(self):
+        return self._observables
+
     def propagate(self, aircraft, env, dt=0.01):
 
         time = self._ode_kin_equats.t + dt
@@ -48,5 +54,12 @@ class System(object):
         else:
             raise RuntimeError('Integration was not successful')
 
+        self._update_observables(aircraft, env)
+
         return self._state
 
+    def _update_observables(self, aircraft, env):
+        gnd_spd = bn.get_gnd_spd(self.state_dict['psi'], self._TAS,
+                                env.wind_to[0], env.wind_to[1])
+        self._observables['gnd_spd'] = gnd_spd
+        self._observables.update(env.observables)
