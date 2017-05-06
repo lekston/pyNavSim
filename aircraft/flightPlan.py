@@ -26,9 +26,13 @@ class FlightPlan:
             res = False
         return res
 
-wpt_list = np.array([0,     0,
-                     0,     1000,
-                     0,     1500])
-wpt_arr = np.ndarray(shape=(3, 2), dtype=int, buffer=wpt_list)
+    @property
+    def current_leg(self):
+        return np.array([self.prev_wp, self.next_wp])
+
+wpt_list = np.array([0.,     0.,
+                     0.,     1000.,
+                     0.,     1500.])
+wpt_arr = np.ndarray(shape=(3, 2), dtype=float, buffer=wpt_list)
 
 basic_fpl = FlightPlan(wpt_arr)
