@@ -1,5 +1,5 @@
 """ Conventions & units:
-    - bearing and wind_dir are in degrees
+    - All angles in radians (unless stated otherwise)
     - positive crosswind is to the right (blows along Y axis)
     - positive tailwind increases ground speed (blows along X axis)
     - negative tailwind is headwind
@@ -29,15 +29,26 @@ def get_gnd_spd(psi, tas, wind_dir_to, wind_spd):
     return np.array([v_x, v_y])
 
 
+def get_bearing(origin, dest):
+    """
+    :param origin:
+    :param dest:
+    :return: ground course from origin to destination
+    """
+    dx = dest[0] - origin[0]
+    dy = dest[1] - origin[1]
+    return np.arctan2(dx, dy)
+
+
 def dist_2d(x1, x2):
-    assert(type(x1) is tuple or type(x1) is np.ndarray)
-    assert(type(x2) is tuple or type(x2) is np.ndarray)
+    assert(type(x1) in [tuple, list, np.ndarray])
+    assert(type(x2) in [tuple, list, np.ndarray])
     diff = (x1[0] - x2[0], x1[1] - x2[1])
     return norm_2d(diff)
 
 
 def norm_2d(x):
-    assert(type(x) is tuple or type(x) is np.ndarray)
+    assert(type(x) in [tuple, list, np.ndarray])
     return np.sqrt(x[0]**2 + x[1]**2)
 
 
