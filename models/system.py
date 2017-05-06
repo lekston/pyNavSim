@@ -15,7 +15,8 @@ class System(object):
         self.p = 0.
         self._state = np.array([self.x, self.y, phi, psi, self.p])
         self._TAS = tas
-        self._observables = {'gnd_spd': 0.}
+        self._observables = {'gnd_spd': 0.,
+                             'TAS': tas}
 
         self.kin_equats = kin_equats
 
@@ -62,4 +63,5 @@ class System(object):
         gnd_spd = bn.get_gnd_spd(self.state_dict['psi'], self._TAS,
                                 env.wind_to[0], env.wind_to[1])
         self._observables['gnd_spd'] = gnd_spd
+        self._observables['TAS'] = self._TAS
         self._observables.update(env.observables)
