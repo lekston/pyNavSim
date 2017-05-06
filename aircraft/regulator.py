@@ -98,19 +98,31 @@ class L1NavRegulator(Regulator):
 
     def update_wp_nav(self, system, prev_wp, next_wp, observables):
 
+        psi = system.state_dict['psi']
+        tas = observables['TAS']
+        wind = observables['wind']
+        gnd_spd_vect = observables['gnd_spd']
+
+        if bn.norm_2d(gnd_spd_vect) < 0.1:
+            raise RuntimeError("Unable to fly forward due to wind")
+            # APM assumes minimal gnd_spd along heading to keep on computing
+
+        wind_vec = np.array([np.sin(wind[0]), np.cos(wind[0])]) * wind[1]
+        tas_vec = np.array([np.sin(psi), np.cos(psi)]) * tas
+        current_loc_vec = np.array([system.state_dict['x'],
+                                     system.state_dict['y']])
+
         K_L1 = 4.0 * self.L1_damping**2
 
-        gnd_spd = 0
+        target_bearing = bn.get_bearing(prev_wp, next_wp)
+        or2target_vec = next_wp - prev_wp                  # AB
+        or2target_dist = bn.norm_2d(or2target_vec)
+        or2target_vec *= 1./or2target_dist                 # normalize
 
-        tas = 0
+        origin_vec = current_loc_vec - prev_wp             # A_air
 
-        psi = system.state_dict['psi']
-
-        wind = observables['wind']
-
-        gnd_spd = observables['gnd_spd']
-
-        bn.get_gnd_spd(psi, tas, wind_dir_to=wind[0], wind_spd=wind[1])
+        # TODO: potential APM bug! (missing 0.5 factor)
+        crosstrack_err = np.cross(origin_vec, or2target_vec) * 0.5   # (A_air % AB) (APM is missing the 0.5 factor)
 
         return 0
 
