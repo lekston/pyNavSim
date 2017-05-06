@@ -1,0 +1,12 @@
+
+Sim coordinate frame conventions:
+ - Y is North
+ - X is East
+ - phi is measured from Y to the right (normal heading convention)
+ - this simplifies the use of plotting modules
+
+APM coordinate frame conventions:
+ - NED:
+    > X is North
+    > Y is East
+    > Z is Down
