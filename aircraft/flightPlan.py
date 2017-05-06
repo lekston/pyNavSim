@@ -4,12 +4,12 @@ import utils.basic_nav as bn
 
 class FlightPlan:
 
-    def __init__(self, wpt_array, accept_dis=40):
+    def __init__(self, wpt_array, accept_dist=40):
         self.wp_idx  = 0
         self.wpt_arr = wpt_array
         self.prev_wp = self.wpt_arr[0]   # local Euclidean coordinates
         self.next_wp = self.wpt_arr[1]   # local Euclidean coordinates
-        self.wp_accept_dist = accept_dis # m
+        self.wp_accept_dist = accept_dist  # m
 
     def update(self, pos):
         if self.have_passed_next_wp(pos) and (self.wp_idx < len(self.wpt_arr) - 1):

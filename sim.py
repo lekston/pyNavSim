@@ -61,7 +61,7 @@ class Sim(object):
             self._log_dict[name][self._time_step] = self._system.state_dict[name]
 
         for idx, key in enumerate(self._aircraft.regulators):
-            for subkey in self._par_list[idx+1]:
+            for subkey in self._par_list[idx + 1]:
                 self._log_dict[subkey][self._time_step] = self._aircraft.regulators[key].current_val_dict[subkey]
 
     @property

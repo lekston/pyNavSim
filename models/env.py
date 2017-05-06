@@ -1,12 +1,23 @@
 import numpy as np
+import utils.basic_nav as bn
 
 
 class Env:
 
-    def __init__(self, wind_dir=0, wind_spd=0):
+    def __init__(self, wind_dir_to=0, wind_spd=0):
 
-        self._wind = np.array([wind_dir, wind_spd])
+        self._wind_to = np.array([wind_dir_to, wind_spd])
 
     @property
     def wind(self):
-        return self._wind
+        return self._wind_to
+
+    @property
+    def wind_to(self):
+        return self._wind_to
+
+    @property
+    def wind_from(self):
+        dir_to = self.wind[0]
+        spd = self.wind[1]
+        return np.array([bn.wrap_2pi(dir_to - np.pi), spd])

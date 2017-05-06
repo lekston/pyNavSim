@@ -3,38 +3,15 @@
     - positive crosswind is to the right (blows along Y axis)
     - positive tailwind increases ground speed (blows along X axis)
     - negative tailwind is headwind
-
-struct DR_Results {
-    float WindCorrAngle;
-    float GndSpd;
-    float CrossWind;
-    float TailWind;
-}; // Dead Reckon results
-
-struct DR_Results get_wind_corr(float bearing, float airspeed, float wind_dir, float wind_spd)
-{
-    struct DR_Results results;
-
-    float wta = ToRad(wrap_180(bearing - wind_dir)); // wind dir to track angle
-
-    results.CrossWind = wind_spd * sinf(wta);
-    results.TailWind = -wind_spd * cosf(wta);
-
-    float wca = -asinf(results.CrossWind / airspeed); // radians
-    results.WindCorrAngle = ToDeg(wca);
-    results.GndSpd = airspeed * cosf(wca) + results.TailWind;
-
-    return results;
-}
 """
 from numpy import sin, cos, arcsin
 import numpy as np
 
-''' wind_dir - where to the wind is blowing '''
+''' wind_dir_to - where TO the wind is blowing '''
 
 
-def get_wind_corr(psi, tas, wind_dir, wind_spd):
-    wta = wrap_180(wind_dir - psi)  # wind dir relative to track angle
+def get_wind_corr(track_angle, tas, wind_dir_to, wind_spd):
+    wta = wrap_180(wind_dir_to - track_angle)  # wind dir relative to track angle
 
     xwind = wind_spd * sin(wta)
     twind = wind_spd * cos(wta)
@@ -43,6 +20,13 @@ def get_wind_corr(psi, tas, wind_dir, wind_spd):
     gnd_spd = tas * cos(wca) + twind
 
     return np.array([wca, gnd_spd, xwind, twind])
+
+
+def get_gnd_spd(psi, tas, wind_dir_to, wind_spd):
+
+    v_x = sin(psi) * tas + sin(wind_dir_to) * wind_spd
+    v_y = cos(psi) * tas + cos(wind_dir_to) * wind_spd
+    return np.array([v_x, v_y])
 
 
 def dist_2d(x1, x2):
@@ -66,3 +50,14 @@ def wrap_180(angle):
 
 def wrap_360(angle):
     return angle % 360.0
+
+
+def wrap_2pi(angle):
+    return angle % (2*np.pi)
+
+
+def wrap_pi(angle):
+    result = wrap_2pi(angle)
+    if result > np.pi:
+        result -= 2*np.pi
+    return result
