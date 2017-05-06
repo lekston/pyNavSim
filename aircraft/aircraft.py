@@ -12,6 +12,7 @@ class Aircraft(object):
         self._regulators = dict(roll=rollReg, nav=navReg)
         self._last_controls = np.array([0])  # zero control input is still a valid input
         self._par_list = []
+        self._obs_data = dict()
 
     @property
     def airspeed(self):
@@ -25,19 +26,20 @@ class Aircraft(object):
     def controls(self):
         return self._last_controls
 
+    def measure(self, obs_dict):
+        self._obs_data = obs_dict
+
     def update(self, system, only_low_level=False, override_roll_dem=0):
 
         # pass position to fpl object to verify reaching waypoints
         cur_leg = self._fpl.update(system.state[:2])
+        roll_dem = self._regulators['nav'].update(system, cur_leg, self._obs_data)
 
-        roll_dem      = self._regulators['nav'].update(system, cur_leg)
         if only_low_level:
             roll_dem = override_roll_dem
-        roll_rate_dem = self._regulators['roll'].update(system, roll_dem)
 
+        roll_rate_dem = self._regulators['roll'].update(system, roll_dem, self._obs_data)
         self._last_controls = np.array([roll_rate_dem])
-
-        # TODO logging of aircraft control variables
 
         return roll_rate_dem
 

@@ -23,6 +23,7 @@ class Sim(object):
 
         self.save_current_par_dict()
         self._system.propagate(self._aircraft, self._env, dt)
+        self._aircraft.measure(self._system.observables)
         self._aircraft.update(self._system, self._only_low_level, self._override_roll_dem)
         self._time_step += 1
 

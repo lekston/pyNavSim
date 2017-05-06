@@ -1,6 +1,6 @@
 from abc import abstractmethod
 import numpy as np
-
+import utils.basic_nav as bn
 
 class Regulator(object):
 
@@ -10,7 +10,7 @@ class Regulator(object):
         self._log_dict = {}
 
     @abstractmethod
-    def update(self, system, demand):
+    def update(self, system, demand, observables):
         return
 
     @property
@@ -48,11 +48,12 @@ class RollRegulator(Regulator):
     def p_dot_max(self):
         return self._p_dot_max
 
-    def update(self, system, roll_dem):
+    def update(self, system, demand, observables):
 
         # TODO consider time scale of the regulator
 
         roll = system.state_dict['phi']
+        roll_dem = demand  # TODO rate-limit the roll demand
         err = roll_dem - roll
         err_dot_raw = self._prev_err - err
         err_dot_flt = 0.8 * self._prev_state + 0.2 * err_dot_raw
@@ -80,9 +81,11 @@ class L1NavRegulator(Regulator):
         res = np.clip(res, -np.pi / 2, np.pi / 2)
         return res
 
-    def update(self, system, cur_leg):
+    def update(self, system, demand, observables):
 
-        self.update_wp_nav(cur_leg[0], cur_leg[1])
+        cur_leg = demand
+
+        self.update_wp_nav(system, cur_leg[0], cur_leg[1], observables)
 
         if 1:
             tmp = 0
@@ -93,11 +96,22 @@ class L1NavRegulator(Regulator):
 
         return self.nav_roll_dem(latAccDem)
 
-    def update_wp_nav(self, prev_wp, next_wp):
+    def update_wp_nav(self, system, prev_wp, next_wp, observables):
 
         K_L1 = 4.0 * self.L1_damping**2
 
         gnd_spd = 0
+
+        tas = 0
+
+        psi = system.state_dict['psi']
+
+        wind = observables['wind']
+
+        gnd_spd = observables['gnd_spd']
+
+        bn.get_gnd_spd(psi, tas, wind_dir_to=wind[0], wind_spd=wind[1])
+
         return 0
 
 
