@@ -25,7 +25,7 @@ class Aircraft(object):
     def controls(self):
         return self._last_controls
 
-    def update(self, system, only_low_level=False, override_roll_dem = 0):
+    def update(self, system, only_low_level=False, override_roll_dem=0):
 
         # pass position to fpl object to verify reaching waypoints
         cur_leg = self._fpl.update(system.state[:2])
