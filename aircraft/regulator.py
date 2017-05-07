@@ -10,7 +10,7 @@ class Regulator(object):
         self._log_dict = {}
 
     @abstractmethod
-    def update(self, system, demand, observables):
+    def update(self, system, dt, demand, observables):
         return
 
     @property
@@ -32,7 +32,7 @@ class RollRegulator(Regulator):
         self._prev_err   = 0
         self._prev_state = 0
         self._k_p        = 0.5
-        self._k_d        = -100     # TODO compensate the time scale
+        self._k_d        = 1
         self._par_list   = ['p_dot_dem']
         self._log_dict   = {'p_dot_dem': 0}
 
@@ -48,7 +48,7 @@ class RollRegulator(Regulator):
     def p_dot_max(self):
         return self._p_dot_max
 
-    def update(self, system, demand, observables):
+    def update(self, system, dt, demand, observables):
 
         # TODO consider time scale of the regulator
 
@@ -56,10 +56,10 @@ class RollRegulator(Regulator):
         roll_dem = np.clip(demand, -self._phi_max, self._phi_max)
         # TODO rate-limit the roll demand
         err = roll_dem - roll
-        err_dot_raw = self._prev_err - err
+        err_dot_raw = (self._prev_err - err)/dt
         err_dot_flt = 0.8 * self._prev_state + 0.2 * err_dot_raw
 
-        roll_rate_cmd = self._k_p * err + self._k_d * err_dot_flt
+        roll_rate_cmd = self._k_p * err - self._k_d * err_dot_flt
         self._log_dict['p_dot_dem'] = roll_rate_cmd
 
         self._prev_state = err_dot_flt
@@ -83,7 +83,7 @@ class L1NavRegulator(Regulator):
         res = np.clip(res, -np.pi / 2, np.pi / 2)
         return res
 
-    def update(self, system, demand, observables):
+    def update(self, system, dt, demand, observables):
 
         cur_leg = demand
 
@@ -119,7 +119,7 @@ class L1NavRegulator(Regulator):
         origin_vec = current_loc_vec - prev_wp             # A_air
         origin_dist = bn.norm_2d(origin_vec)               # WP_A_dist
 
-        crosstrack_err = -np.cross(origin_vec, or2target_vec)    # A_air % AB_norm
+        crosstrack_err = -np.cross(origin_vec, or2target_vec)   # A_air % AB_norm (minus due to x-y coord swap)
 
         coveredTrack_dist = np.dot(origin_vec, or2target_vec)   # alongTrackDist
 
@@ -129,7 +129,7 @@ class L1NavRegulator(Regulator):
             nav_bearing = 0
         else:
             # calculate Nu to fly along the AB line
-            xtrackVel = -np.cross(gnd_spd_vect, or2target_vec)   # gnd_spd % AB_norm
+            xtrackVel = -np.cross(gnd_spd_vect, or2target_vec)   # gnd_spd % AB_norm (minus due to x-y coord swap)
             ltrackVel = np.dot(gnd_spd_vect, or2target_vec)
             Nu2 = np.arctan2(xtrackVel, ltrackVel)              # angle of velocity relative to track line
 

@@ -29,16 +29,16 @@ class Aircraft(object):
     def measure(self, obs_dict):
         self._obs_data = obs_dict
 
-    def update(self, system, only_low_level=False, override_roll_dem=0):
+    def update(self, system, dt, only_low_level=False, override_roll_dem=0):
 
         # pass position to fpl object to verify reaching waypoints
         cur_leg = self._fpl.update(system.state[:2])
-        roll_dem = self._regulators['nav'].update(system, cur_leg, self._obs_data)
+        roll_dem = self._regulators['nav'].update(system, dt, cur_leg, self._obs_data)
 
         if only_low_level:
             roll_dem = override_roll_dem
 
-        roll_rate_dem = self._regulators['roll'].update(system, roll_dem, self._obs_data)
+        roll_rate_dem = self._regulators['roll'].update(system, dt, roll_dem, self._obs_data)
         self._last_controls = np.array([roll_rate_dem])
 
         return roll_rate_dem
