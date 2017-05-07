@@ -4,7 +4,7 @@ import utils.basic_nav as bn
 
 class FlightPlan:
 
-    def __init__(self, wpt_array, accept_dist=40):
+    def __init__(self, wpt_array, accept_dist=60):
         self.wp_idx  = 0
         self.wpt_arr = wpt_array
         self.prev_wp = self.wpt_arr[0]   # local Euclidean coordinates
@@ -31,8 +31,13 @@ class FlightPlan:
         return np.array([self.prev_wp, self.next_wp])
 
 wpt_list = np.array([0.,     0.,
-                     0.,     1000.,
-                     0.,     1500.])
-wpt_arr = np.ndarray(shape=(3, 2), dtype=float, buffer=wpt_list)
+                     0.,     200.,
+                     200.,   0.,
+                     200.,   1000.])
+wpt_list_mr = np.array([0.,     0.,
+                        0.,     200.,
+                        -200.,   0.,
+                        -200.,   1000.])
+wpt_arr = np.ndarray(shape=(4, 2), dtype=float, buffer=wpt_list)
 
 basic_fpl = FlightPlan(wpt_arr)
