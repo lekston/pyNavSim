@@ -24,15 +24,16 @@ class Regulator(object):
 
 class RollRegulator(Regulator):
 
-    def __init__(self, phi_max=40, p_max=40, p_dot_max=30):
+    def __init__(self, phi_max=35, p_max=80, p_dot_max=80):
         super(RollRegulator, self).__init__()
         self._phi_max    = np.deg2rad(phi_max)      # 40 deg by default
-        self._p_max      = np.deg2rad(p_max)        # 40 deg/sec by default
-        self._p_dot_max  = np.deg2rad(p_dot_max)    # 30 deg/sec^2 by default
+        self._p_max      = np.deg2rad(p_max)        # 60 deg/sec by default
+        self._p_dot_max  = np.deg2rad(p_dot_max)    # 80 deg/sec^2 by default
         self._prev_err   = 0
         self._prev_state = 0
+        self._prev_p_cmd = 0
         self._k_p        = 0.5
-        self._k_d        = 1
+        self._k_d        = 3
         self._par_list   = ['p_dot_dem']
         self._log_dict   = {'p_dot_dem': 0}
 
@@ -56,10 +57,15 @@ class RollRegulator(Regulator):
         roll_dem = np.clip(demand, -self._phi_max, self._phi_max)
         # TODO rate-limit the roll demand
         err = roll_dem - roll
+
+        err = np.clip(err, self._prev_err - self._p_max*dt,
+                           self._prev_err + self._p_max*dt)
+
         err_dot_raw = (self._prev_err - err)/dt
         err_dot_flt = 0.8 * self._prev_state + 0.2 * err_dot_raw
 
         roll_rate_cmd = self._k_p * err - self._k_d * err_dot_flt
+
         self._log_dict['p_dot_dem'] = roll_rate_cmd
 
         self._prev_state = err_dot_flt
