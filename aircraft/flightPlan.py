@@ -30,14 +30,14 @@ class FlightPlan:
     def current_leg(self):
         return np.array([self.prev_wp, self.next_wp])
 
-wpt_list = np.array([0.,     0.,
+wpt_list = np.array([0.,     100.,
                      0.,     200.,
                      200.,   0.,
                      200.,   1000.])
-wpt_list_mr = np.array([0.,     0.,
+wpt_list_mr = np.array([0.,     100.,
                         0.,     200.,
                         -200.,   0.,
                         -200.,   1000.])
-wpt_arr = np.ndarray(shape=(4, 2), dtype=float, buffer=wpt_list)
+wpt_arr = np.ndarray(shape=(4, 2), dtype=float, buffer=wpt_list_mr)
 
 basic_fpl = FlightPlan(wpt_arr)
