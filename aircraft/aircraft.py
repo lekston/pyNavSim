@@ -26,6 +26,9 @@ class Aircraft(object):
     def controls(self):
         return self._last_controls
 
+    def reset_fpl(self):
+        self._fpl.reset_fpl()
+
     def measure(self, obs_dict):
         self._obs_data = obs_dict
 

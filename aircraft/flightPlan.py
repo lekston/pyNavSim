@@ -26,6 +26,11 @@ class FlightPlan:
             res = False
         return res
 
+    def reset_fpl(self):
+        self.wp_idx  = 0
+        self.prev_wp = self.wpt_arr[0]   # local Euclidean coordinates
+        self.next_wp = self.wpt_arr[1]   # local Euclidean coordinates
+
     @property
     def current_leg(self):
         return np.array([self.prev_wp, self.next_wp])
