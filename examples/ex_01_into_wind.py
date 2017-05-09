@@ -37,26 +37,26 @@ sim = Sim(ac, sys, env, time, verbose=False)
 sim.run_simulation()
 
 fig1 = plt.figure(1)
-plt.plot(sim.logs['x'][:-2], sim.logs['y'][:-2])
+plt.plot(sim.logs['S_x'][:-2], sim.logs['S_y'][:-2])
 # plt.plot(time[:-2], sim.logs['x'][:-2])
 ax1 = fig1.gca()
 dr.set_1to1_scale(ax1)
 
 # TODO fig2 & fig3 to subplots
 fig2 = plt.figure(2)
-plt.plot(time, sim.logs['p'], 'b-', time, sim.logs['p_dem'], 'r-')
+plt.plot(time, sim.logs['S_p'], 'b-', time, sim.logs['R_p_dem'], 'r-')
 ax2 = fig2.gca()
 # set_1to1_scale(ax2)
 ax2.set_ylabel('p[rad/s]')
 
 fig3 = plt.figure(3)
-plt.plot(time, sim.logs['phi'], 'b-', time, sim.logs['phi_dem_ll'], 'r-')
+plt.plot(time, sim.logs['S_phi'], 'b-', time, sim.logs['R_phi_dem_ll'], 'r-')
 ax3 = fig3.gca()
 # set_1to1_scale(ax3)
 ax3.set_ylabel('phi[rad]')
 
 fig4 = plt.figure(4)
-plt.plot(time, [ bn.wrap_180(np.rad2deg(psi)) for psi in sim.logs['psi']])
+plt.plot(time, [ bn.wrap_180(np.rad2deg(psi)) for psi in sim.logs['S_psi']])
 ax4 = fig4.gca()
 ax4.set_ylabel('psi[deg]')
 

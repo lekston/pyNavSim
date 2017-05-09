@@ -37,7 +37,7 @@ class RollRegulator(Regulator):
         self._prev_state = 0
         self._k_p        = 0.1
         self._k_d        = 3
-        self._log_dict   = {'p_dem': 0, 'phi_dem_ll': 0}
+        self._log_dict   = {'R_p_dem': 0, 'R_phi_dem_ll': 0}
         self._par_list   = [key for key in self._log_dict.iterkeys()]
 
     @property
@@ -54,7 +54,7 @@ class RollRegulator(Regulator):
 
     def update(self, system, dt, demand, observables):
 
-        roll = system.state_dict['phi']
+        roll = system.state_dict['S_phi']
 
         if not self._filt_init:
             self._filt_init = True
@@ -70,8 +70,8 @@ class RollRegulator(Regulator):
 
         roll_rate_cmd = self._k_p * err - self._k_d * err_dot_flt
 
-        self._log_dict['p_dem'] = roll_rate_cmd
-        self._log_dict['phi_dem_ll'] = roll_dem
+        self._log_dict['R_p_dem'] = roll_rate_cmd
+        self._log_dict['R_phi_dem_ll'] = roll_dem
 
         self._prev_phi_dem = roll_dem
         self._prev_state = err_dot_flt
@@ -84,7 +84,7 @@ class L1NavRegulator(Regulator):
 
     def __init__(self):
         super(L1NavRegulator, self).__init__()
-        self.L1_period      = 30.     # sec
+        self.L1_period      = 30.    # sec
         self.L1_damping     = 0.85   # dimensionless
         self._log_dict      = {'L1_Nu': 0, 'L1_TargBrng': 0, 'L1_NavBrng': 0}
         self._par_list      = [key for key in self._log_dict.iterkeys()]
@@ -105,7 +105,7 @@ class L1NavRegulator(Regulator):
 
     def update_wp_nav(self, system, prev_wp, next_wp, observables):
 
-        psi = system.state_dict['psi']
+        psi = system.state_dict['S_psi']
         tas = observables['TAS']
         wind = observables['wind']
         gnd_spd_vect = observables['gnd_spd']
@@ -117,8 +117,8 @@ class L1NavRegulator(Regulator):
 
         wind_vec = np.array([np.sin(wind[0]), np.cos(wind[0])]) * wind[1]
         tas_vec = np.array([np.sin(psi), np.cos(psi)]) * tas
-        current_loc_vec = np.array([system.state_dict['x'],
-                                    system.state_dict['y']])
+        current_loc_vec = np.array([system.state_dict['S_x'],
+                                    system.state_dict['S_y']])
 
         K_L1 = 4.0 * self.L1_damping**2
         L1_dist = 1/np.pi**2 * self.L1_damping * self.L1_period * gnd_spd

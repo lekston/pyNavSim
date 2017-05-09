@@ -44,7 +44,7 @@ class Sim(object):
         self._override_roll_dem = roll_dem
 
     def setup_logging(self):
-        self._par_list[0] = ['x', 'y', 'phi', 'psi', 'p']
+        self._par_list[0] = ['S_x', 'S_y', 'S_phi', 'S_psi', 'S_p']
         for key in self._aircraft.regulators:
             self._par_list.append(self._aircraft.regulators[key].par_list)
 
