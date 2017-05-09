@@ -18,6 +18,11 @@ ACCESS to LOGGED DATA:
     for key in sim.logs.iterkeys():
         print key
 
+LOGGING DATA NAMING CONVENTION:
+ - S_ prefix - system state vector variables
+ - R_ prefix - roll regulator
+ - L1_ prefix - L1 navigation regulator
+
 COORDINATE FRAME CONVENTION
 
 Sim coordinate frame convention:
