@@ -11,6 +11,9 @@ except:
 
 import matplotlib.pyplot as plt
 
+plt.close("all")
+plt.rc('text', usetex=True)
+plt.rc('font', family='serif')
 
 phi_init = 0.0
 
@@ -23,28 +26,32 @@ N = t_sim_end * sampling_rate + 1
 time = np.linspace(0, t_sim_end, num=N)
 
 sim = Sim(basic_aircraft, sys, env, time, verbose=False)
-#sim.override_roll(np.deg2rad(40))
+# sim.override_roll(np.deg2rad(40))
 sim.run_simulation()
 
 
-fig1 = plt.figure(1)
+fig1 = plt.figure()
 plt.plot(sim.logs['S_x'][:-2], sim.logs['S_y'][:-2])
 # plt.plot(time[:-2], sim.logs['x'][:-2])
+plt.grid()
 ax1 = fig1.gca()
+plt.xlabel("x")
+plt.ylabel("y")
 dr.set_1to1_scale(ax1)
 
-# TODO fig2 & fig3 to subplots
-fig2 = plt.figure(2)
-plt.plot(time, sim.logs['S_p'], 'b-', time, sim.logs['R_p_dem'], 'r-')
-ax2 = fig2.gca()
-# set_1to1_scale(ax2)
-ax2.set_ylabel('p[rad/s]')
+fig2 = plt.figure()
+ax1 = plt.subplot(211)
+plt.plot(time, sim.logs['S_p'], time, sim.logs['R_p_dem'], 'r')
+plt.xlabel("Time [s]")
+plt.ylabel("$p\left[\\frac{rad}{s}\\right]$")
+plt.legend(["$p$", "$p_{dem}$"])
+plt.grid()
 
-fig3 = plt.figure(3)
-plt.plot(time, sim.logs['S_phi'], 'b-', time, sim.logs['R_phi_dem_ll'], 'r-')
-ax3 = fig3.gca()
-# set_1to1_scale(ax3)
-ax3.set_ylabel('phi[rad]')
+ax2 = plt.subplot(212, sharex=ax1)
+plt.plot(time, sim.logs['S_phi'], time, sim.logs['R_phi_dem_ll'], 'r')
+plt.xlabel("Time [s]")
+plt.ylabel("$\phi [rad]$")
+plt.legend(["$\phi$", "$\phi_{dem}$"])
+plt.grid()
 
 plt.show()
-
