@@ -26,6 +26,10 @@ class Aircraft(object):
     def controls(self):
         return self._last_controls
 
+    @property
+    def flight_plan(self):
+        return self._fpl
+
     def reset_fpl(self):
         self._fpl.reset_fpl()
 
