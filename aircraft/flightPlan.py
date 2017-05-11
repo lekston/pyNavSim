@@ -35,6 +35,10 @@ class FlightPlan:
     def current_leg(self):
         return np.array([self.prev_wp, self.next_wp])
 
+    @property
+    def wpt(self):
+        return self.wpt_arr
+
 wpt_list = np.array([0.,     100.,
                      0.,     200.,
                      200.,   0.,
