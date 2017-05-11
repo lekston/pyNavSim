@@ -41,7 +41,8 @@ sim = Sim(ac, sys, env, time, verbose=False)
 sim.run_simulation()
 
 fig1 = plt.figure()
-plt.plot(sim.logs['S_x'][:-2], sim.logs['S_y'][:-2])
+wp = ac.flight_plan.wpt_arr
+plt.plot(sim.logs['S_x'][:-2], sim.logs['S_y'][:-2], wp[:, 0], wp[:, 1], 'ro')
 # plt.plot(time[:-2], sim.logs['x'][:-2])
 plt.grid()
 plt.title("Trajectory")
