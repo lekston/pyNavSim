@@ -2,7 +2,7 @@ import numpy as np
 import utils.basic_nav as bn
 
 
-class FlightPlan:
+class FlightPlan(object):
 
     def __init__(self, wpt_array, accept_dist=60):
         self.wp_idx  = 0
