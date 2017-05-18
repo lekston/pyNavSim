@@ -1,4 +1,4 @@
-from regulator import rollReg, navReg
+from regulator import stdRollReg, stdNavReg
 from flightPlan import basic_fpl
 
 import numpy as np
@@ -6,10 +6,10 @@ import numpy as np
 
 class Aircraft(object):
 
-    def __init__(self, flightPlan=basic_fpl):
+    def __init__(self, flightPlan=basic_fpl, roll_reg=stdRollReg, nav_reg=stdNavReg):
         self._TAS = 15  # m/s
         self._fpl = flightPlan
-        self._regulators = dict(roll=rollReg, nav=navReg)
+        self._regulators = dict(roll=roll_reg, nav=nav_reg)
         self._last_controls = np.array([0])  # zero control input is still a valid input
         self._par_list = []
         self._obs_data = dict()

@@ -82,10 +82,10 @@ class RollRegulator(Regulator):
 # noinspection PyPep8Naming
 class L1NavRegulator(Regulator):
 
-    def __init__(self):
+    def __init__(self, period=30, damping=0.85):
         super(L1NavRegulator, self).__init__()
-        self.L1_period      = 30.    # sec
-        self.L1_damping     = 0.85   # dimensionless
+        self.L1_period      = period    # sec
+        self.L1_damping     = damping   # dimensionless
         self._log_dict      = {'L1_Nu': 0, 'L1_TargBrng': 0, 'L1_NavBrng': 0}
         self._par_list      = [key for key in self._log_dict.iterkeys()]
 
@@ -166,6 +166,6 @@ class L1NavRegulator(Regulator):
         return latAccDem
 
 
-rollReg = RollRegulator()
-navReg = L1NavRegulator()
+stdRollReg = RollRegulator()
+stdNavReg = L1NavRegulator()
 
