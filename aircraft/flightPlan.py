@@ -12,7 +12,7 @@ class FlightPlan(object):
         self.wp_accept_dist = accept_dist  # m
 
     def update(self, pos):
-        if self.have_passed_next_wp(pos) and (self.wp_idx < len(self.wpt_arr) - 1):
+        if self.have_passed_next_wp(pos) and (self.wp_idx < len(self.wpt_arr) - 2):
             self.wp_idx += 1
             self.prev_wp = self.wpt_arr[self.wp_idx]
             self.next_wp = self.wpt_arr[self.wp_idx + 1]
