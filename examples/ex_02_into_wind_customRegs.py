@@ -65,10 +65,10 @@ dr.set_1to1_scale(ax1)
 
 fig2 = plt.figure()
 ax1 = plt.subplot(2, 1, 1)
-plt.plot(time, sim.logs['S_p'], time, sim.logs['R_p_dot_dem'], 'r')
+plt.plot(time, sim.logs['S_p'], time, sim.logs['R_p_dot_cmd'], 'r')
 plt.xlabel("Time [s]")
 plt.ylabel("$p\left[\\frac{rad}{s}\\right]$")
-plt.legend(["$p$", "$\dot{p}_{dem}$"])
+plt.legend(["$p$", "$\dot{p}_{cmd}$"])
 plt.grid()
 
 ax2 = plt.subplot(2, 1, 2, sharex=ax1)
