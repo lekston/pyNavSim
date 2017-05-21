@@ -38,7 +38,7 @@ class RollRegulator(Regulator):
         self._prev_state = 0
         self._k_p        = 0.1
         self._k_d        = 3
-        self._log_dict   = {'R_p_dot_dem': 0, 'R_phi_dem_ll': 0}
+        self._log_dict   = {'R_p_dot_cmd': 0, 'R_phi_dem_ll': 0}
         self._par_list   = [key for key in self._log_dict.iterkeys()]
 
     @property
@@ -74,7 +74,7 @@ class RollRegulator(Regulator):
         # low-pass the output to better reflect speed-control characteristics of ailerons
         p_dot_cmd = 0.9 * self._prev_p_dot_cmd + 0.1 * p_dot_cmd
 
-        self._log_dict['R_p_dot_dem'] = p_dot_cmd
+        self._log_dict['R_p_dot_cmd'] = p_dot_cmd
         self._log_dict['R_phi_dem_ll'] = roll_dem
 
         self._prev_p_dot_cmd = p_dot_cmd
