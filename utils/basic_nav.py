@@ -11,7 +11,7 @@ import numpy as np
 
 
 def get_wind_corr(track_angle, tas, wind_dir_to, wind_spd):
-    wta = wrap_180(wind_dir_to - track_angle)  # wind dir relative to track angle
+    wta = wrap_pi(wind_dir_to - track_angle)  # wind dir relative to track angle
 
     xwind = wind_spd * sin(wta)
     twind = wind_spd * cos(wta)
