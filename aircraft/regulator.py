@@ -29,6 +29,7 @@ class RollRegulator(Regulator):
         super(RollRegulator, self).__init__()
         self._filt_init         = False
         self._prev_phi_dem      = 0
+        self._prev_p_dot_cmd    = 0
         self._phi_dem_dot_max   = np.deg2rad(30)    # 30 deg/sec by default
         self._phi_max    = np.deg2rad(phi_max)      # 35 deg by default
         self._p_max      = np.deg2rad(p_max)        # 60 deg/sec by default
@@ -37,7 +38,7 @@ class RollRegulator(Regulator):
         self._prev_state = 0
         self._k_p        = 0.1
         self._k_d        = 3
-        self._log_dict   = {'R_p_dem': 0, 'R_phi_dem_ll': 0}
+        self._log_dict   = {'R_p_dot_dem': 0, 'R_phi_dem_ll': 0}
         self._par_list   = [key for key in self._log_dict.iterkeys()]
 
     @property
@@ -68,15 +69,20 @@ class RollRegulator(Regulator):
         err_dot_raw = (self._prev_err - err)/dt
         err_dot_flt = 0.8 * self._prev_state + 0.2 * err_dot_raw
 
-        roll_rate_cmd = self._k_p * err - self._k_d * err_dot_flt
+        p_dot_cmd = self._k_p * err - self._k_d * err_dot_flt
 
-        self._log_dict['R_p_dem'] = roll_rate_cmd
+        # low-pass the output to better reflect speed-control characteristics of ailerons
+        p_dot_cmd = 0.9 * self._prev_p_dot_cmd + 0.1 * p_dot_cmd
+
+        self._log_dict['R_p_dot_dem'] = p_dot_cmd
         self._log_dict['R_phi_dem_ll'] = roll_dem
 
+        self._prev_p_dot_cmd = p_dot_cmd
         self._prev_phi_dem = roll_dem
         self._prev_state = err_dot_flt
         self._prev_err   = err
-        return roll_rate_cmd
+
+        return p_dot_cmd
 
 
 # noinspection PyPep8Naming

@@ -45,10 +45,10 @@ class Aircraft(object):
         if only_low_level:
             roll_dem = override_roll_dem
 
-        roll_rate_dem = self._regulators['roll'].update(system, dt, roll_dem, self._obs_data)
-        self._last_controls = np.array([roll_rate_dem])
+        p_dot_cmd = self._regulators['roll'].update(system, dt, roll_dem, self._obs_data)
+        self._last_controls = np.array([p_dot_cmd])
 
-        return roll_rate_dem
+        return p_dot_cmd
 
 basic_aircraft = Aircraft()
 
