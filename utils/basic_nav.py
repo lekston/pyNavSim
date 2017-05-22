@@ -10,7 +10,8 @@ import numpy as np
 ''' wind_dir_to - where TO the wind is blowing '''
 
 
-def get_wind_corr(track_angle, tas, wind_dir_to, wind_spd):
+def get_wind_corr(track_angle, tas, wind_obs):
+    wind_dir_to, wind_spd = wind_obs
     wta = wrap_pi(wind_dir_to - track_angle)  # wind dir relative to track angle
 
     xwind = wind_spd * sin(wta)
@@ -22,8 +23,10 @@ def get_wind_corr(track_angle, tas, wind_dir_to, wind_spd):
     return np.array([wca, gnd_spd, xwind, twind])
 
 
-def get_gnd_spd(psi, tas, wind_dir_to, wind_spd):
-
+def get_gnd_spd(psi, tas, wind_obs):
+    
+    wind_dir_to, wind_spd = wind_obs
+    
     v_x = sin(psi) * tas + sin(wind_dir_to) * wind_spd
     v_y = cos(psi) * tas + cos(wind_dir_to) * wind_spd
     return np.array([v_x, v_y])

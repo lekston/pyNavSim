@@ -60,8 +60,7 @@ class System(object):
         return self._state
 
     def _update_observables(self, aircraft, env):
-        gnd_spd = bn.get_gnd_spd(self.state_dict['S_psi'], self._TAS,
-                                env.wind_to[0], env.wind_to[1])
+        gnd_spd = bn.get_gnd_spd(self.state_dict['S_psi'], self._TAS, env.wind_to)
         self._observables['gnd_spd'] = gnd_spd
         self._observables['TAS'] = self._TAS
         self._observables.update(env.observables)
