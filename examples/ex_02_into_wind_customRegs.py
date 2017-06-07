@@ -1,4 +1,5 @@
 import numpy as np
+import scipy.linalg as la
 
 try:
     from models.system import System
@@ -28,7 +29,7 @@ plt.rc('font', family='serif')
 
 phi_init = 0.0
 
-t_sim_end = 40       # sec
+t_sim_end = 60       # sec
 sampling_rate = 100  # Hz
 N = t_sim_end * sampling_rate + 1
 time = np.linspace(0, t_sim_end, num=N)
@@ -36,17 +37,26 @@ time = np.linspace(0, t_sim_end, num=N)
 ''' Define flight plan as below '''
 wpt_list = np.array([0.,     0.,
                      0.,     80.,
-                     10.,    60.,
-                     10.,    400.])
-wpt_arr = np.ndarray(shape=(4, 2), dtype=float, buffer=wpt_list)
+                     -20.,    40.,
+                     -20.,    300.,
+                     200.,   300.])
+wpt_listB = np.array([0.,     0.,
+                     0.,     80.,
+                     20.,    40.,
+                     20.,    300.,
+                     -200.,   300.])
+wpt_arr = np.ndarray(shape=(5, 2), dtype=float, buffer=wpt_list)
 
 ''' Define simulation components '''
-sys = System(phi=phi_init, psi=np.deg2rad(35), use_jac=True)
-env = Env(wind_dir_to=np.deg2rad(270), wind_spd=8)
-fpl = FlightPlan(wpt_arr, accept_dist=40)
+ac_tas = 15.
+env = Env(wind_dir_to=np.deg2rad(90), wind_spd=12)
+init = bn.get_wind_corr(track_angle=np.deg2rad(0), tas=ac_tas, wind_obs=env.wind_to)
+sys = System(phi=phi_init, psi=init[0], use_jac=True)
+
+fpl = FlightPlan(wpt_arr, accept_dist=60)
 rreg = RollRegulator(phi_max=42)    # default phi_max is 35
 nreg = L1NavRegulator(period=20)    # default period is 30
-ac = Aircraft(fpl, roll_reg=rreg, nav_reg=nreg, tas=13)
+ac = Aircraft(fpl, roll_reg=rreg, nav_reg=nreg, tas=ac_tas)
 
 sim = Sim(ac, sys, env, time, verbose=False)
 #sim.override_roll(np.deg2rad(40))
@@ -78,10 +88,29 @@ plt.ylabel("$\phi [rad]$")
 plt.legend(["$\phi$", "$\phi_{dem}$"])
 plt.grid()
 
-fig4 = plt.figure()
-plt.plot(time, [bn.wrap_180(np.rad2deg(psi)) for psi in sim.logs['S_psi']])
+fig3 = plt.figure()
+gnd_spd_vect = [(bn.get_gnd_spd(psi, ac_tas, env.wind_to)) for psi in sim.logs['S_psi']]
+gnd_spd = [la.norm(vect) for vect in gnd_spd_vect]
+gnd_track = [bn.wrap_180(np.rad2deg(np.arctan2(vect[0], vect[1]))) for vect in gnd_spd_vect]
+plt.plot(time, gnd_spd,
+         time, sim.logs['L1_XtrackErr'])
 plt.xlabel("Time [s]")
-plt.ylabel('$\psi$ [$^\circ$]')
+#plt.ylabel("$V_{E}$ [$m/s$]")
+plt.legend(["$V_{E}$ [$m/s$]", "$XtrackErr$ [$m$]"])
+plt.grid()
+
+fig4 = plt.figure()
+plt.plot(time, [bn.wrap_180(np.rad2deg(psi)) for psi in sim.logs['S_psi']],
+         time, gnd_track)
+plt.xlabel("Time [s]")
+#plt.ylabel("$\psi$ [$^\circ$]")
+plt.legend(["$\psi$ [$^\circ$]", "$\psi_{gnd}$ [$^\circ$]"])
+plt.grid()
+
+fig5 = plt.figure()
+plt.plot(time, sim.logs['L1_wca_in'], time, sim.logs['L1_wca_out'])
+plt.xlabel("Time [s]")
+plt.legend(["$wca_{in}$ [$rad$]", "$wca_{out}$ [$rad$]"])
 plt.grid()
 
 plt.show()
