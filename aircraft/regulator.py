@@ -30,7 +30,7 @@ class RollRegulator(Regulator):
         self._filt_init         = False
         self._prev_phi_dem      = 0
         self._prev_p_dot_cmd    = 0
-        self._phi_dem_dot_max   = np.deg2rad(30)    # 30 deg/sec by default
+        self._phi_dem_dot_max   = np.deg2rad(40)    # 40 deg/sec by default
         self._phi_max    = np.deg2rad(phi_max)      # 35 deg by default
         self._p_max      = np.deg2rad(p_max)        # 60 deg/sec by default
         self._p_dot_max  = np.deg2rad(p_dot_max)    # 80 deg/sec^2 by default
@@ -92,7 +92,8 @@ class L1NavRegulator(Regulator):
         super(L1NavRegulator, self).__init__()
         self.L1_period      = period    # sec
         self.L1_damping     = damping   # dimensionless
-        self._log_dict      = {'L1_Nu': 0, 'L1_TargBrng': 0, 'L1_NavBrng': 0}
+        self._log_dict      = {'L1_Nu': 0, 'L1_TargBrng': 0, 'L1_NavBrng': 0, 'L1_XtrackErr': 0,
+                               'L1_wca_in': 0, 'L1_wca_out': 0}
         self._par_list      = [key for key in self._log_dict.iterkeys()]
 
     @staticmethod
@@ -116,6 +117,7 @@ class L1NavRegulator(Regulator):
         wind = observables['wind']
         gnd_spd_vect = observables['gnd_spd']
         gnd_spd = bn.norm_2d(gnd_spd_vect)
+        gnd_trk = bn.wrap_pi(np.arctan2(gnd_spd_vect[0], gnd_spd_vect[1]))
 
         if gnd_spd < 0.1:
             raise RuntimeError("Unable to fly forward due to wind")
@@ -161,6 +163,16 @@ class L1NavRegulator(Regulator):
             Nu = Nu1 + Nu2
             nav_bearing = bn.get_bearing(prev_wp, next_wp) + Nu1
 
+        # wind corr angle is positive when heading must stay to the right of track
+
+        if True:
+            wind_corr_ang_in = bn.wrap_pi(psi-gnd_trk)
+            wind_corr_ang_out = bn.get_wind_corr(nav_bearing, tas, wind_obs=wind)[0]
+            Nu = Nu + wind_corr_ang_out - wind_corr_ang_in
+        else:
+            wind_corr_ang_in = 0
+            wind_corr_ang_out = 0
+
         Nu = np.clip(Nu, -np.pi/2, np.pi/2)
 
         latAccDem = K_L1 * gnd_spd**2 * np.sin(Nu) / L1_dist
@@ -168,6 +180,9 @@ class L1NavRegulator(Regulator):
         self._log_dict['L1_Nu'] = Nu        # bearing_error
         self._log_dict['L1_TargBrng'] = target_bearing
         self._log_dict['L1_NavBrng'] = nav_bearing
+        self._log_dict['L1_XtrackErr'] = crosstrack_err
+        self._log_dict['L1_wca_in'] = wind_corr_ang_in
+        self._log_dict['L1_wca_out'] = wind_corr_ang_out
 
         return latAccDem
 
