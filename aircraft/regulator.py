@@ -92,9 +92,12 @@ class L1NavRegulator(Regulator):
         super(L1NavRegulator, self).__init__()
         self.L1_period      = period    # sec
         self.L1_damping     = damping   # dimensionless
-        self._log_dict      = {'L1_Nu': 0, 'L1_TargBrng': 0, 'L1_NavBrng': 0, 'L1_XtrackErr': 0,
+        self._log_dict      = {'L1_Nu': 0, 'L1_dist':0, 'L1_TargBrng': 0,
+                               'L1_NavBrng': 0, 'L1_XtrackErr': 0,
                                'L1_wca_in': 0, 'L1_wca_out': 0}
         self._par_list      = [key for key in self._log_dict.iterkeys()]
+        self._prev_wca_out  = 0
+        self._gnd_spd_exp   = 0
 
     @staticmethod
     def nav_roll_dem(latAccDem):
@@ -129,7 +132,9 @@ class L1NavRegulator(Regulator):
                                     system.state_dict['S_y']])
 
         K_L1 = 4.0 * self.L1_damping**2
-        L1_dist = 1/np.pi**2 * self.L1_damping * self.L1_period * gnd_spd
+        # use expected ground speed for L1 distance computation
+        ref_spd = max(gnd_spd, self._gnd_spd_exp)
+        L1_dist = 1/np.pi**2 * self.L1_damping * self.L1_period * ref_spd
 
         target_bearing = bn.get_bearing(current_loc_vec, next_wp)
         or2target_vec = next_wp - prev_wp                  # AB
@@ -143,6 +148,7 @@ class L1NavRegulator(Regulator):
 
         coveredTrack_dist = np.dot(origin_vec, or2target_vec)   # alongTrackDist
 
+        Nu1 = 0
         if (origin_dist > L1_dist) and (coveredTrack_dist/np.max([origin_dist, 1.]) < -np.sqrt(2)/2.):
             # calculate Nu to fly to WP A
             origin_vec *= 1./bn.norm_2d(origin_vec)             # normalize
@@ -154,7 +160,7 @@ class L1NavRegulator(Regulator):
             # calculate Nu to fly along the AB line
             xtrackVel = -np.cross(gnd_spd_vect, or2target_vec)  # gnd_spd % AB_norm (minus due to x-y coord swap)
             ltrackVel = np.dot(gnd_spd_vect, or2target_vec)
-            Nu2 = np.arctan2(xtrackVel, ltrackVel)              # angle of velocity relative to track line
+            Nu2 = np.arctan2(xtrackVel, ltrackVel)                  # angle of velocity relative to track line
 
             sine_Nu1 = crosstrack_err/np.max([L1_dist, 0.1])
             sine_Nu1 = np.clip(sine_Nu1, -np.sqrt(2)/2., np.sqrt(2)/2.)   # capture angle of 45 deg or less
@@ -164,20 +170,40 @@ class L1NavRegulator(Regulator):
             nav_bearing = bn.get_bearing(prev_wp, next_wp) + Nu1
 
         # wind corr angle is positive when heading must stay to the right of track
+        wind_corr_ang_in = bn.wrap_pi(psi-gnd_trk)
+        wind_corr_ang_out, gnd_spd_out = bn.get_wind_corr(nav_bearing, tas, wind_obs=wind)[0:2]
+
+        self._gnd_spd_exp = gnd_spd_out
 
         if True:
-            wind_corr_ang_in = bn.wrap_pi(psi-gnd_trk)
-            wind_corr_ang_out = bn.get_wind_corr(nav_bearing, tas, wind_obs=wind)[0]
-            Nu = Nu + wind_corr_ang_out - wind_corr_ang_in
-        else:
-            wind_corr_ang_in = 0
-            wind_corr_ang_out = 0
+            # apply the correction only if the wca_out is constant or changing slowly (wca_out ~ Nu1)
+            if True: #(abs(wind_corr_ang_out - self._prev_wca_out) < 0.01*0.01): # 0.05 rad/sec (0.6 deg/sec)
+                Nu = Nu + wind_corr_ang_out - wind_corr_ang_in
+                pass
+            else:
+                wind_corr_ang_in = 0
+                '''
+                if (abs(Nu1) > 0.01*0.2):
+                    wind_corr_ang_out = bn.get_wind_corr(bn.get_bearing(prev_wp, next_wp), tas, wind_obs=wind)[0]
+                    Nu = Nu + wind_corr_ang_out - wind_corr_ang_in
+                    # option: fade-out this correction as the capture angle becomes smaller
+                '''
+
+            self._prev_wca_out = wind_corr_ang_out
+
+        # TODO How to anticipate the future rate of change of the demand??
+        # We must adjust the trajectory in a manner that ensures that
+        # the future (short term) rate of change of the demand will not exceed airplane limits.
+        #   L1_Period does this I guess
+
+        # TODO Consider adapting L1_distance to the expression abs(wca_out - wca_in)
 
         Nu = np.clip(Nu, -np.pi/2, np.pi/2)
 
         latAccDem = K_L1 * gnd_spd**2 * np.sin(Nu) / L1_dist
 
         self._log_dict['L1_Nu'] = Nu        # bearing_error
+        self._log_dict['L1_dist'] = L1_dist
         self._log_dict['L1_TargBrng'] = target_bearing
         self._log_dict['L1_NavBrng'] = nav_bearing
         self._log_dict['L1_XtrackErr'] = crosstrack_err

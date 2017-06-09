@@ -93,10 +93,11 @@ gnd_spd_vect = [(bn.get_gnd_spd(psi, ac_tas, env.wind_to)) for psi in sim.logs['
 gnd_spd = [la.norm(vect) for vect in gnd_spd_vect]
 gnd_track = [bn.wrap_180(np.rad2deg(np.arctan2(vect[0], vect[1]))) for vect in gnd_spd_vect]
 plt.plot(time, gnd_spd,
-         time, sim.logs['L1_XtrackErr'])
+         time, sim.logs['L1_XtrackErr'],
+         time, sim.logs['L1_dist'])
 plt.xlabel("Time [s]")
 #plt.ylabel("$V_{E}$ [$m/s$]")
-plt.legend(["$V_{E}$ [$m/s$]", "$XtrackErr$ [$m$]"])
+plt.legend(["$V_{E}$ [$m/s$]", "$XtrackErr$ [$m$]", "$L1_{dist}$"])
 plt.grid()
 
 fig4 = plt.figure()
