@@ -1,0 +1,3 @@
+https://stackoverflow.com/questions/25342072/computing-and-drawing-vector-fields
+
+http://matplotlib.org/examples/pylab_examples/quiver_demo.html
