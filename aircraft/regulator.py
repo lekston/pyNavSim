@@ -98,6 +98,7 @@ class L1NavRegulator(Regulator):
         self._par_list      = [key for key in self._log_dict.iterkeys()]
         self._prev_wca_out  = 0
         self._gnd_spd_exp   = 0
+        self._dt            = 0
 
     @staticmethod
     def nav_roll_dem(latAccDem):
@@ -108,6 +109,8 @@ class L1NavRegulator(Regulator):
     def update(self, system, dt, demand, observables):
 
         cur_leg = demand
+
+        self._dt = dt
 
         latAccDem = self.update_wp_nav(system, cur_leg[0], cur_leg[1], observables)
 
@@ -172,12 +175,16 @@ class L1NavRegulator(Regulator):
         # wind corr angle is positive when heading must stay to the right of track
         wind_corr_ang_in = bn.wrap_pi(psi-gnd_trk)
         wind_corr_ang_out, gnd_spd_out = bn.get_wind_corr(nav_bearing, tas, wind_obs=wind)[0:2]
+        # Note: when using direct prev_wp to next_wp bearing instead of Nu1 corrected nav_bearing
+        # the downwind performance is improved but everything else is degraded
 
         self._gnd_spd_exp = gnd_spd_out
 
         if True:
             # apply the correction only if the wca_out is constant or changing slowly (wca_out ~ Nu1)
-            if True: #(abs(wind_corr_ang_out - self._prev_wca_out) < 0.01*0.01): # 0.05 rad/sec (0.6 deg/sec)
+            # OR
+            # apply the correction only if the wca_out is changing considerably (wca_out ~ Nu1)
+            if True: # (abs(wind_corr_ang_out - self._prev_wca_out) > 0.05*self._dt): # 0.05 rad/sec (0.6 deg/sec)
                 Nu = Nu + wind_corr_ang_out - wind_corr_ang_in
                 pass
             else:
@@ -197,6 +204,8 @@ class L1NavRegulator(Regulator):
         #   L1_Period does this I guess
 
         # TODO Consider adapting L1_distance to the expression abs(wca_out - wca_in)
+
+        # TODO RUN PARALLEL SIMULATIONS FOR MODIFIED AND BASE L1 CONTROLLERS
 
         Nu = np.clip(Nu, -np.pi/2, np.pi/2)
 

@@ -23,29 +23,42 @@ except:
 
 import matplotlib.pyplot as plt
 
+plt.ion()
 plt.close("all")
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 
 phi_init = 0.0
 
-t_sim_end = 60       # sec
+t_sim_end = 80       # sec
 sampling_rate = 100  # Hz
+f = sampling_rate
 N = t_sim_end * sampling_rate + 1
 time = np.linspace(0, t_sim_end, num=N)
 
 ''' Define flight plan as below '''
+# TODO the two mirrored flight plans below demonstrate the twofold effects of the suggested improvements
 wpt_list = np.array([0.,     0.,
                      0.,     80.,
                      -20.,    40.,
                      -20.,    300.,
                      200.,   300.])
-wpt_listB = np.array([0.,     0.,
+wpt_listA = np.array([0.,     0.,
                      0.,     80.,
                      20.,    40.,
                      20.,    300.,
                      -200.,   300.])
-wpt_arr = np.ndarray(shape=(5, 2), dtype=float, buffer=wpt_list)
+wpt_listB = np.array([0.,     0.,
+                     0.,     80.,
+                     150.,    80.,
+                     150.,    300.,
+                     -200.,   300.])
+wpt_listC = np.array([0.,     0.,
+                     0.,     80.,
+                     -150.,    80.,
+                     -150.,    300.,
+                     200.,   300.])
+wpt_arr = np.ndarray(shape=(5, 2), dtype=float, buffer=wpt_listA)
 
 ''' Define simulation components '''
 ac_tas = 15.
@@ -64,7 +77,8 @@ sim.run_simulation()
 
 fig1 = plt.figure()
 wp = ac.flight_plan.wpt_arr
-plt.plot(sim.logs['S_x'][:-2], sim.logs['S_y'][:-2], wp[:, 0], wp[:, 1], 'ro')
+plt.plot(sim.logs['S_x'][:-2], sim.logs['S_y'][:-2], wp[:, 0], wp[:, 1], 'ro',
+         sim.logs['S_x'][:-2:f*2], sim.logs['S_y'][:-2:f*2], 'gx')
 # plt.plot(time[:-2], sim.logs['x'][:-2])
 plt.grid()
 plt.title("Trajectory")
@@ -115,3 +129,5 @@ plt.legend(["$wca_{in}$ [$rad$]", "$wca_{out}$ [$rad$]"])
 plt.grid()
 
 plt.show()
+
+# plt.close('all')
