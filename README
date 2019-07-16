@@ -2,7 +2,7 @@ HOW TO START?
 
 - launch ipython console from root
 - call:
-    execfile('./example/ex_00.py')
+    execfile('./examples/ex_00.py')
 
 - for restaring the simulation:
     basic_aircraft.reset_fpl() # (ex_00)
