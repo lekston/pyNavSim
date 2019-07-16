@@ -26,3 +26,6 @@ class Env:
     @property
     def observables(self):
         return self._observables
+
+    def print_wind(self):
+        print("Wind_dir_to: %d / speed: %d" % (self._wind_to[0], self._wind_to[1]))

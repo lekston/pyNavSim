@@ -77,7 +77,8 @@ sim.run_simulation()
 
 fig1 = plt.figure()
 wp = ac.flight_plan.wpt_arr
-plt.plot(sim.logs['S_x'][:-2], sim.logs['S_y'][:-2], wp[:, 0], wp[:, 1], 'ro',
+plt.plot(sim.logs['S_x'][:-2], sim.logs['S_y'][:-2],
+         wp[:,0], wp[:,1], 'ro', wp[:,0], wp[:,1], 'r',
          sim.logs['S_x'][:-2:f*2], sim.logs['S_y'][:-2:f*2], 'gx')
 # plt.plot(time[:-2], sim.logs['x'][:-2])
 plt.grid()
@@ -127,6 +128,9 @@ plt.plot(time, sim.logs['L1_wca_in'], time, sim.logs['L1_wca_out'])
 plt.xlabel("Time [s]")
 plt.legend(["$wca_{in}$ [$rad$]", "$wca_{out}$ [$rad$]"])
 plt.grid()
+
+fig6 = plt.figure()
+plt.plot(time, time)
 
 plt.show()
 

@@ -39,14 +39,9 @@ class FlightPlan(object):
     def wpt(self):
         return self.wpt_arr
 
-wpt_list = np.array([0.,     100.,
-                     0.,     200.,
-                     200.,   0.,
-                     200.,   1000.])
-wpt_list_mr = np.array([0.,     100.,
-                        0.,     200.,
-                        -200.,   0.,
-                        -200.,   1000.])
-wpt_arr = np.ndarray(shape=(4, 2), dtype=float, buffer=wpt_list_mr)
+basic_wpt_list = np.array([0.,     10.,
+                           0.,     1000.])
 
-basic_fpl = FlightPlan(wpt_arr)
+basic_wpt_arr = np.ndarray(shape=(2, 2), dtype=float, buffer=basic_wpt_list)
+
+basic_fpl = FlightPlan(basic_wpt_arr)
