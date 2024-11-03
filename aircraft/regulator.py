@@ -181,9 +181,10 @@ class L1NavRegulator(Regulator):
         self._gnd_spd_exp = gnd_spd_out
 
         if True:
-            # apply the correction only if the wca_out is constant or changing slowly (wca_out ~ Nu1)
+            # TODO: test the following
+            # - apply the correction only if the wca_out is constant or changing slowly (wca_out ~ Nu1)
             # OR
-            # apply the correction only if the wca_out is changing considerably (wca_out ~ Nu1)
+            # - apply the correction only if the wca_out is changing considerably (wca_out ~ Nu1)
             if True: # (abs(wind_corr_ang_out - self._prev_wca_out) > 0.05*self._dt): # 0.05 rad/sec (0.6 deg/sec)
                 Nu = Nu + wind_corr_ang_out - wind_corr_ang_in
                 pass

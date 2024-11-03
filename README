@@ -1,3 +1,6 @@
+PREREQUSITES
+sudo apt install cm-super
+
 HOW TO START?
 
 - launch ipython console from root
@@ -15,8 +18,8 @@ ACCESS to LOGGED DATA:
     sim.log['name_of_key']
 
 - to check currenly available keys run:
-    for key in sim.logs.iterkeys():
-        print key
+    for key in sim.logs.keys():
+        print(key)
 
 LOGGING DATA NAMING CONVENTION:
  - S_ prefix - system state vector variables
