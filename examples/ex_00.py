@@ -8,10 +8,10 @@ try:
     from utils import drawing as dr
     from sim import Sim
 except Exception as e:
-    print "Check run path, must be run from: ./40.SmoothTraj"
-    print type(e)
-    print e.args
-    print e
+    print("Check run path, must be run from: ./40.SmoothTraj")
+    print(type(e))
+    print(e.args)
+    print(e)
 
 import matplotlib.pyplot as plt
 

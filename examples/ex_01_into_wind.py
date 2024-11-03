@@ -9,7 +9,7 @@ try:
     from utils import basic_nav as bn
     from sim import Sim
 except:
-    print "Check run path, must be run from: ./40.SmoothTraj"
+    print("Check run path, must be run from: ./40.SmoothTraj")
 
 import matplotlib.pyplot as plt
 

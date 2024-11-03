@@ -1,5 +1,5 @@
-from regulator import stdRollReg, stdNavReg
-from flightPlan import basic_fpl
+from .regulator import stdRollReg, stdNavReg
+from .flightPlan import basic_fpl
 
 import numpy as np
 

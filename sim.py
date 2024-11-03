@@ -54,7 +54,7 @@ class Sim(object):
 
                 if self._verbose:
                     sys.stdout.write(name + str(' '))
-        print  # end line
+        print()  # end line
 
     def save_current_par_dict(self):
 

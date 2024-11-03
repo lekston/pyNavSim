@@ -39,7 +39,7 @@ class RollRegulator(Regulator):
         self._k_p        = 0.1
         self._k_d        = 3
         self._log_dict   = {'R_p_dot_cmd': 0, 'R_phi_dem_ll': 0}
-        self._par_list   = [key for key in self._log_dict.iterkeys()]
+        self._par_list   = [key for key in self._log_dict.keys()]
 
     @property
     def phi_max(self):
@@ -95,7 +95,7 @@ class L1NavRegulator(Regulator):
         self._log_dict      = {'L1_Nu': 0, 'L1_dist':0, 'L1_TargBrng': 0,
                                'L1_NavBrng': 0, 'L1_XtrackErr': 0,
                                'L1_wca_in': 0, 'L1_wca_out': 0}
-        self._par_list      = [key for key in self._log_dict.iterkeys()]
+        self._par_list      = [key for key in self._log_dict.keys()]
         self._prev_wca_out  = 0
         self._gnd_spd_exp   = 0
         self._dt            = 0

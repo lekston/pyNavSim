@@ -5,12 +5,12 @@ try:
     from models.system import System
     from models.env import Env
 except:
-    print "Error importing models"
+    print("Error importing models")
 
 try:
     from aircraft.aircraft import Aircraft
 except:
-    print "Error importing aircraft"
+    print("Error importing aircraft")
 
 try:
     from aircraft.flightPlan import FlightPlan
@@ -19,7 +19,7 @@ try:
     from utils import basic_nav as bn
     from sim import Sim
 except:
-    print "Check run path, must be run from: ./40.SmoothTraj"
+    print("Check run path, must be run from: ./40.SmoothTraj")
 
 import matplotlib.pyplot as plt
 
