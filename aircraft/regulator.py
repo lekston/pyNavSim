@@ -180,22 +180,23 @@ class L1NavRegulator(Regulator):
 
         self._gnd_spd_exp = gnd_spd_out
 
-        if True:
+        apply_wind_correction = True
+        if apply_wind_correction:
             # TODO: test the following
             # - apply the correction only if the wca_out is constant or changing slowly (wca_out ~ Nu1)
             # OR
             # - apply the correction only if the wca_out is changing considerably (wca_out ~ Nu1)
-            if True: # (abs(wind_corr_ang_out - self._prev_wca_out) > 0.05*self._dt): # 0.05 rad/sec (0.6 deg/sec)
+            force_basic_correction = True
+            has_low_dynamics = (abs(wind_corr_ang_out - self._prev_wca_out) > 0.05*self._dt) # 0.05 rad/sec (0.6 deg/sec)
+            high_capture_angle_supported = False
+            if force_basic_correction or has_low_dynamics:
                 Nu = Nu + wind_corr_ang_out - wind_corr_ang_in
-                pass
+            elif high_capture_angle_supported and (abs(Nu1) > 0.01*0.2):
+                wind_corr_ang_out = bn.get_wind_corr(bn.get_bearing(prev_wp, next_wp), tas, wind_obs=wind)[0]
+                Nu = Nu + wind_corr_ang_out - wind_corr_ang_in
+                # option: fade-out this correction as the capture angle becomes smaller
             else:
                 wind_corr_ang_in = 0
-                '''
-                if (abs(Nu1) > 0.01*0.2):
-                    wind_corr_ang_out = bn.get_wind_corr(bn.get_bearing(prev_wp, next_wp), tas, wind_obs=wind)[0]
-                    Nu = Nu + wind_corr_ang_out - wind_corr_ang_in
-                    # option: fade-out this correction as the capture angle becomes smaller
-                '''
 
             self._prev_wca_out = wind_corr_ang_out
 
